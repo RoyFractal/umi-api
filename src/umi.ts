@@ -93,7 +93,7 @@ async function sendUMI(
   _publicKey: Array<number>,
   toAddress: string,
   amount: number
-): Promise<boolean> {
+): Promise<boolean | object> {
   let privateKey = Uint8Array.from(_privateKey);
   let publicKey = Uint8Array.from(_publicKey);
   let toPublicKey = Uint8Array.from(
@@ -117,8 +117,8 @@ async function sendUMI(
     let result = await sendUmiTransaction(trx64);
 
     if (result) {
-      console.log("send umi result: ", JSON.stringify(result));
-      return true;
+      console.log("send umi result: ", result);
+      return result;
     } else {
       console.log("error send umi: ", result);
       return false;

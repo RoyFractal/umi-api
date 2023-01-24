@@ -22,7 +22,7 @@ export class UmiService {
     }
 
 
-    static async sendUmi(privateKey: Array<number>, publicKey: Array<number>, targetAddress: string, amount: number): Promise<boolean> {
+    static async sendUmi(privateKey: Array<number>, publicKey: Array<number>, targetAddress: string, amount: number): Promise<boolean | object> {
         return await umi.sendUMI(privateKey, publicKey, targetAddress, amount * 100)
     }
 
