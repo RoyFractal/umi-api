@@ -1,4 +1,3 @@
-import { HttpException } from '@nestjs/common';
 import { Controller, Get, Param, Post, Body, HttpStatus, Res, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { off } from 'process';
