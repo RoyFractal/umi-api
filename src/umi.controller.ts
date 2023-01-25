@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Post, Body, HttpStatus, Res, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { off } from 'process';
-import { SendUmiDto, SignMessageDto, RestoreWalletDto } from './umi.dto';
+import { SendUmiDto, SignMessageDto, RestoreWalletDto, GenerateWalletDto } from './umi.dto';
 import { UmiService } from './umi.service'
 
 
@@ -34,15 +34,15 @@ export class UmiController {
     }
 
     @Post("generate_wallet")
-    async generateWallet(): Promise<object> {
-        return { wallet: await UmiService.generateWallet() }
+    async generateWallet(@Body() generateWalletDto: GenerateWalletDto): Promise<object> {
+        return { wallet: await UmiService.generateWallet(generateWalletDto.prefix) }
     }
 
-    @Post("send_umi")
+    @Post("send")
     async sendUmi(@Body() sendUmiDto: SendUmiDto): Promise<object> {
         return {
-            result: await UmiService.sendUmi(
-                sendUmiDto.privateKey, sendUmiDto.publicKey, sendUmiDto.targetAddress, sendUmiDto.amount
+            result: await UmiService.send(
+                sendUmiDto.privateKey, sendUmiDto.publicKey, sendUmiDto.targetAddress, sendUmiDto.amount, sendUmiDto.prefix
             )
         }
     }
@@ -57,7 +57,7 @@ export class UmiController {
     @Post("restore_wallet")
     async restoreWallet(@Body() restoreWalletDto: RestoreWalletDto): Promise<object> {
         return {
-            result: await UmiService.restoreWallet(restoreWalletDto.mnemonic)
+            result: await UmiService.restoreWallet(restoreWalletDto.mnemonic, restoreWalletDto.prefix)
         }
     }
 }

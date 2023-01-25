@@ -16,7 +16,7 @@ interface Keys {
 interface WalletData {
   mnemonic: string;
   keys: Keys;
-  umiAddress: string;
+  address: string;
 }
 
 async function getUmiBalance(address: string): Promise<number> {
@@ -64,19 +64,19 @@ async function sendUmiTransaction(
   }
 }
 
-async function generateWallet(): Promise<WalletData> {
-  return restoreWallet(bip39.generateMnemonic(256));
+async function generateWallet(prefix: string): Promise<WalletData> {
+  return restoreWallet(bip39.generateMnemonic(256), prefix);
 }
 
-async function restoreWallet(mnemonic: string): Promise<WalletData> {
+async function restoreWallet(mnemonic: string, prefix: string): Promise<WalletData> {
   let keys = await generateKeys(mnemonic);
-  let umiAddress = getUmiAdress(keys.publicKey);
-  return { mnemonic, keys, umiAddress };
+  let address = getUmiAdress(keys.publicKey, prefix);
+  return { mnemonic, keys, address };
 }
 
-function getUmiAdress(publicKey: Uint8Array | Array<number>): string {
+function getUmiAdress(publicKey: Uint8Array | Array<number>, prefix: string): string {
   let words = bech32.toWords(Buffer.from(publicKey));
-  return bech32.encode("umi", words);
+  return bech32.encode(prefix, words);
 }
 
 async function generateKeys(mnemonic: string): Promise<Keys> {
@@ -88,11 +88,12 @@ async function generateKeys(mnemonic: string): Promise<Keys> {
   );
 }
 
-async function sendUMI(
+async function send(
   _privateKey: Array<number>,
   _publicKey: Array<number>,
   toAddress: string,
-  amount: number
+  amount: number,
+  prefix: string,
 ): Promise<boolean | object> {
   let privateKey = Uint8Array.from(_privateKey);
   let publicKey = Uint8Array.from(_publicKey);
@@ -103,7 +104,7 @@ async function sendUMI(
     let trx = new Uint8Array(150);
     setVersion(trx, 8);
 
-    let prefix_binary = uint16ToBytes(prefixToVersion("umi"));
+    let prefix_binary = uint16ToBytes(prefixToVersion(prefix));
     let from_address = new Uint8Array([...prefix_binary, ...publicKey]);
     setSender(trx, from_address);
 
@@ -117,14 +118,14 @@ async function sendUMI(
     let result = await sendUmiTransaction(trx64);
 
     if (result) {
-      console.log("send umi result: ", result);
+      console.log(`send ${prefix} result - ${result}`);
       return result;
     } else {
-      console.log("error send umi: ", result);
+      console.log(`error send ${prefix} result - ${result}`);
       return false;
     }
   } catch (error) {
-    console.log("error send umi: ", error);
+    console.log(`error send ${prefix} error - ${error}`);
     return false;
   }
 }
@@ -203,7 +204,7 @@ function hexStringToInt(string_data: string): Uint8Array {
 export default {
   getUmiBalance,
   generateWallet,
-  sendUMI,
+  send,
   signMessage,
   restoreWallet,
   getUmiTransactions,

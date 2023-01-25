@@ -1,6 +1,6 @@
 # Umi-Api 
 
-web api for umi
+web api for umi and glize
 
 
 run with
