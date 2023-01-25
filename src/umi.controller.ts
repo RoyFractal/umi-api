@@ -30,7 +30,7 @@ export class UmiController {
         required: false
     })
     async getTransactions(@Param('address') address: string, @Query('limit') limit?: number, @Query('offset') offset?: number): Promise<object> {
-        return { balance: await UmiService.getTransactions(address, limit, offset) }
+        return { transactions: await UmiService.getTransactions(address, limit, offset) }
     }
 
     @Post("generate_wallet")
